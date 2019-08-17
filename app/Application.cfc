@@ -53,7 +53,7 @@ component {
 		this.sessionStorage = 'session';
 		// https://rorylaitila.gitbooks.io/lucee/content/clustering.html#thissessioncluster
 		//  true is only needed for round-robin
-		this.sessionCluster = false;
+		this.sessionCluster = true;
 	}
 		
 	this.sessionManagement = true;
