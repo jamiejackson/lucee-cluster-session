@@ -11,12 +11,6 @@ browser, available at http://localhost:8081/
 
 ## Running Demo
 
-### Create an /etc/hosts entry
-
-```
-127.0.0.1 lucee-cluster
-```
-
 ### Build Lucee Image
 
 ```sh
@@ -31,7 +25,7 @@ eval docker-compose config 2>/dev/null | docker stack deploy -c- cluster
 
 ### Try Demo
 
-http://lucee-cluster:8999/
+http://localhost:8999/
 
 ### Tear Down
 

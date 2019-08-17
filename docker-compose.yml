@@ -17,7 +17,7 @@ services:
       DOCKER_TASK_NAME: "{{.Task.Name}}"
       DOCKER_TASK_SLOT: "{{.Task.Slot}}"
       PERSIST_SESSIONS: ${LUCEE_PERSIST_SESSIONS:?LUCEE_PERSIST_SESSIONS}
-      VIRTUAL_HOST: lucee-cluster
+      VIRTUAL_HOST: localhost
       VIRTUAL_PORT: 8888
     volumes:
       - ./app:/var/www
