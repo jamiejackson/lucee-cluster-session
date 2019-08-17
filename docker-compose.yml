@@ -1,0 +1,65 @@
+version: '3.6'
+
+services:
+  lucee:
+    build:
+      context: lucee
+    image: lucee
+    container_name: lucee
+    ports:
+      - '8888:8888'
+    environment:
+      DOCKER_NODE_HOSTNAME: "{{.Node.Hostname}}"
+      DOCKER_NODE_ID: "{{.Node.ID}}"
+      DOCKER_SERVICE_ID: "{{.Service.ID}}"
+      DOCKER_SERVICE_LABELS: "{{.Service.Labels}}"
+      DOCKER_SERVICE_NAME: "{{.Service.Name}}"
+      DOCKER_TASK_NAME: "{{.Task.Name}}"
+      DOCKER_TASK_SLOT: "{{.Task.Slot}}"
+      PERSIST_SESSIONS: ${LUCEE_PERSIST_SESSIONS:?LUCEE_PERSIST_SESSIONS}
+      VIRTUAL_HOST: lucee-cluster
+      VIRTUAL_PORT: 8888
+    volumes:
+      - ./app:/var/www
+    deploy:
+      replicas: ${LUCEE_REPLICA_COUNT:?LUCEE_REPLICA_COUNT}
+    healthcheck:
+      test: curl --fail -s http://localhost:8888 || exit 1
+      # time between running checks
+      interval: 5s
+      # maximum time to allow one check to run
+      timeout: 5s
+      # consecutive failures needed to report unhealthy
+      retries: 3
+      # Start period for the container to initialize before starting
+      #  health-retries countdown
+      start_period: 15s
+  
+  redis:
+    image: redis
+    container_name: redis
+    volumes:
+      - redis-data:/data
+    hostname: redis
+      
+  redis-commander:
+    container_name: redis-commander
+    image: rediscommander/redis-commander:latest
+    restart: always
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+    - 8081:8081
+  
+  # this is used because some browsers seem to reuse tcp connections, which 
+  #  prevents swarm's round-robin load-balancing from working. put a proxy in
+  #  front of lucee, instead.
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "8999:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+volumes:
+  redis-data:
